@@ -156,36 +156,6 @@ def filter_coautor(researcher_selected):
     return dff.to_dict('records')
 
 
-@callback(Output("grid", "rowData"), Input("store-selected", "data"), prevent_initial_call=True)
-def update_rowdata(records):
-    return records
-
-@callback(Output("map_heading", "children"), Input("select_researcher", "selectedRows"))
-def update_map_title(researcher_selected):
-    number_selected = len(researcher_selected)
-    if number_selected < 3:
-        researcher_selected = [i['Name'].split(']')[0][1:] for i in researcher_selected]
-        return 'Co-author Map by City - {}'.format(' ,'.join(researcher_selected))
-    else:
-        return 'Co-author Map by City - {} Seleted Researchers'.format(number_selected)
-
-@callback(Output("coauthor_list_heading", "children"), 
-          Input("select_researcher", "selectedRows"),
-          Input("store-selected", "data"))
-def update_co_author_list_title(researcher_selected, co_author_filtered):
-    researcher_selected = [i['Name'] for i in researcher_selected]#.split(']')[0][1:]
-    displayed_number = len(co_author_filtered)
-    total_co_author = researcher[researcher.Name.isin(researcher_selected)]['Number of co-authors'].sum()
-    number_selected = len(researcher_selected)
-    if number_selected < 5:
-        text = ' ,'.join([i.split(']')[0][1:] for i in researcher_selected])
-    else:
-        text = '{} Selected Researcher'.format(number_selected)
-    
-    return "Co-author List of {} ({} out of {})".format(text, 
-                                                       displayed_number, 
-                                                       int(total_co_author))
-
 
 @callback(Output("co_author_map", "figure"), Input("store-selected", "data"), prevent_initial_call=True)
 def co_author_map(records):
@@ -209,8 +179,36 @@ def co_author_map(records):
     
     return fig
 
+@callback(Output("map_heading", "children"), Input("select_researcher", "selectedRows"))
+def update_map_title(researcher_selected):
+    number_selected = len(researcher_selected)
+    if number_selected < 3:
+        researcher_selected = [i['Name'].split(']')[0][1:] for i in researcher_selected]
+        return 'Co-author Map by City - {}'.format(' ,'.join(researcher_selected))
+    else:
+        return 'Co-author Map by City - {} Seleted Researchers'.format(number_selected)
 
 
+@callback(Output("grid", "rowData"), Input("store-selected", "data"), prevent_initial_call=True)
+def update_rowdata(records):
+    return records
+
+@callback(Output("coauthor_list_heading", "children"), 
+          Input("select_researcher", "selectedRows"),
+          Input("store-selected", "data"))
+def update_co_author_list_title(researcher_selected, co_author_filtered):
+    researcher_selected = [i['Name'] for i in researcher_selected]#.split(']')[0][1:]
+    displayed_number = len(co_author_filtered)
+    total_co_author = researcher[researcher.Name.isin(researcher_selected)]['Number of co-authors'].sum()
+    number_selected = len(researcher_selected)
+    if number_selected < 5:
+        text = ' ,'.join([i.split(']')[0][1:] for i in researcher_selected])
+    else:
+        text = '{} Selected Researcher'.format(number_selected)
+    
+    return "Co-author List of {} ({} out of {})".format(text, 
+                                                       displayed_number, 
+                                                       int(total_co_author))
 
 
 if __name__ == "__main__":
