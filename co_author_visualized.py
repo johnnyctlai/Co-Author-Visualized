@@ -61,7 +61,7 @@ researcher['Name'] = '[' + researcher.name + ']' + '(' + researcher['Scopus link
 # In[40]:
 
 
-app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors']].dropna()
