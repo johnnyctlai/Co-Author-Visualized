@@ -88,7 +88,9 @@ researcher_selection = dag.AgGrid(
 control_panel = researcher_selection
 
 heading = html.H1("Co-author Visualized",className="bg-secondary text-white p-2 mb-4")
-github_link = html.A('[GitHub]', href='https://github.com/johnnyctlai/Co-Author-Visualized')
+intro = dcc.Markdown("""
+    Visualize the co-authors locations of ERC grant receivers and highly cited researchers from Naples and Bologna [[GitHub]](https://github.com/johnnyctlai/Co-Author-Visualized)
+    """)
 
 researcher_selection_heading = html.H5("Select researcher(s) in the table below", 
                                        id = 'researcher_selection_heading',
@@ -134,7 +136,7 @@ map_plot = dcc.Graph(id='co_author_map')
 
 app.layout = dbc.Container(
     [dcc.Store(id="store-selected", data=[]),
-     heading, github_link,
+     heading, intro,
      dbc.Row([dbc.Col(html.Div([researcher_selection_heading, researcher_selection_text, control_panel])),
               dbc.Col(html.Div([map_heading, map_plot]))]),
      
