@@ -79,7 +79,7 @@ researcher_selection = dag.AgGrid(
                    "initialWidth": 200 , 
                    "floatingFilter": False},
     dashGridOptions={"rowSelection": 'multiple'},
-    selectedRows = researcher_data.to_dict('records')[0],
+    selectedRows = [researcher_data.to_dict('records')[0]],
     columnSize="sizeToFit",
     rowClassRules = {"bg-secondary text-dark bg-opacity-25": "params.node.rowPinned === 'top' | params.node.rowPinned === 'bottom'"},
     style={"height": 400, "width": "100%"}
