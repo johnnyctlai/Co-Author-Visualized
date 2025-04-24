@@ -64,7 +64,7 @@ researcher['Name'] = '[' + researcher.name + ']' + '(' + researcher['Scopus link
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors']].dropna()
+researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors']].dropna().sort_values('Name')
 
 researcher_selection = dag.AgGrid(
     id="select_researcher",
@@ -79,7 +79,7 @@ researcher_selection = dag.AgGrid(
                    "initialWidth": 200 , 
                    "floatingFilter": False},
     dashGridOptions={"rowSelection": 'multiple'},
-    selectedRows = researcher_data.to_dict('records'),
+    selectedRows = researcher_data.to_dict('records')[0],
     columnSize="sizeToFit",
     rowClassRules = {"bg-secondary text-dark bg-opacity-25": "params.node.rowPinned === 'top' | params.node.rowPinned === 'bottom'"},
     style={"height": 400, "width": "100%"}
