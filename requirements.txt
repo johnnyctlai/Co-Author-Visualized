@@ -4,4 +4,5 @@ numpy
 plotly
 dash_bootstrap_components
 dash_ag_grid
-gunicorn 
+gunicorn
+openpyxl
