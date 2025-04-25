@@ -33,13 +33,13 @@ researcher = pd.read_excel('researcher_info.xlsx')
 # In[33]:
 
 
-co_author_list['Scopus Author ID'] = co_author_list.apply(
-    lambda x: '[{}]'.format(str(int(x.scopus_author_id))) + '({})'.format(x.hyperlink_author.split('&')[0]) 
-    if not math.isnan(x.scopus_author_id) else 'None', axis = 1)
+co_author_list['Co-author'] = co_author_list.apply(
+    lambda x: '[{}]'.format(x['Co-author']) + '({})'.format(x.hyperlink_author.split('&')[0]) 
+    if type(x.hyperlink_author) == str else x['Co-author'], axis = 1)
 
-co_author_list['Scopus Affiliation ID'] = co_author_list.apply(
-    lambda x: '[{}]'.format(str(int(x.scopus_affiliation_id))) + '({})'.format(x.hyperlink_aff.split('&')[0]) 
-    if not math.isnan(x.scopus_affiliation_id) else 'None', axis = 1)
+co_author_list['Affiliation'] = co_author_list.apply(
+    lambda x: '[{}]'.format(x['Affiliation']) + '({})'.format(x.hyperlink_aff.split('&')[0])
+    if type(x.hyperlink_aff) == str else x['Affiliation'], axis = 1)
 
 
 
@@ -65,6 +65,8 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors']].dropna().sort_values('Name')
+co_author_list = co_author_list[['Researcher', 'Co-author', 'Affiliation', 'City', 'Country/Territory',
+                                'Name', 'city_lat', 'city_lon']]
 
 researcher_selection = dag.AgGrid(
     id="select_researcher",
@@ -119,10 +121,12 @@ table_cols = ['Researcher', 'Co-author', 'Affiliation', 'City', 'Country/Territo
 grid = dag.AgGrid(
     id="grid",
     rowData= [],
-    columnDefs= [{"field": c, "floatingFilter": False} for c in table_cols] + 
-    [{"field": 'Documents', "initialWidth": 150}]+
-    [{"field": 'Scopus Author ID', "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False},
-    {"field": 'Scopus Affiliation ID' , "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False}],
+    columnDefs= 
+    [{"field": 'Researcher', "floatingFilter": False},
+     {"field": 'Co-author', "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False},
+     {"field": 'Affiliation', "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False},
+     {"field": 'Documents', "initialWidth": 150}] +
+    [{"field": c, "floatingFilter": False} for c in ['City', 'Country/Territory']],
     defaultColDef={"filter": True,  "wrapHeaderText": True, "autoHeaderHeight": True, "initialWidth": 200 },
     dashGridOptions={},
     columnSize="sizeToFit",
@@ -130,6 +134,7 @@ grid = dag.AgGrid(
     rowClassRules = {"bg-secondary text-dark bg-opacity-25": "params.node.rowPinned === 'top' | params.node.rowPinned === 'bottom'"},
     style={"height": 600, "width": "120%"}
     )
+
 
 
 map_plot = dcc.Graph(id='co_author_map')
@@ -165,7 +170,7 @@ def co_author_map(records):
     passed_data = pd.DataFrame(records)
     group_by_cols = ['Country/Territory', 'City', 'city_lat', 'city_lon']
 
-    map_data = passed_data.groupby(group_by_cols)['Co-author'].count().reset_index().sort_values('Co-author')
+    map_data = passed_data.groupby(group_by_cols)['Co-author'].count().reset_index()#.sort_values('Co-author')
 
     fig = px.scatter_geo(map_data, lat = 'city_lat', lon = 'city_lon',
                          color='Country/Territory',
