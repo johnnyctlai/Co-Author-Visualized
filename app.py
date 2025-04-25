@@ -50,7 +50,7 @@ co_author_list['Scopus Affiliation ID'] = co_author_list.apply(
 
 
 researcher['Name'] = '[' + researcher.name + ']' + '(' + researcher['Scopus link'] + ')'
-
+co_author_list = co_author_list.merge(researcher[['name', 'Name']], left_on= 'Researcher', right_on = 'name', how = 'left')
 
 
 
@@ -97,7 +97,7 @@ researcher_selection_heading = html.H5("Select researcher(s) in the table below"
                                        className="bg-secondary text-white p-2 mb-4")
 
 researcher_selection_text = dcc.Markdown("""
-    Hold down CTRL while clicking on the rows to select.\n
+    Hold down CTRL while clicking on the rows to select multiple reserchers.\n
     Hold down SHIFT while clicking a second row will select the range between the first and second row."
     """)
 
@@ -111,7 +111,7 @@ coauthor_list_heading = html.H5("Co-author List",
 
 
 
-table_cols = ['Co-author', 'Affiliation', 'City', 'Country/Territory']
+table_cols = ['Researcher', 'Co-author', 'Affiliation', 'City', 'Country/Territory']
 
 #data_filtered = data
 
@@ -154,8 +154,8 @@ app.layout = dbc.Container(
 
 @callback(Output("store-selected", "data"), Input("select_researcher", "selectedRows"))
 def filter_coautor(researcher_selected):
-    researcher_selected = [i['Name'].split(']')[0][1:] for i in researcher_selected]
-    dff = co_author_list[co_author_list['Researcher'].isin(researcher_selected)]
+    researcher_selected = [i['Name'] for i in researcher_selected]
+    dff = co_author_list[co_author_list['Name'].isin(researcher_selected)]
     return dff.to_dict('records')
 
 
@@ -185,7 +185,7 @@ def co_author_map(records):
 @callback(Output("map_heading", "children"), Input("select_researcher", "selectedRows"))
 def update_map_title(researcher_selected):
     number_selected = len(researcher_selected)
-    if number_selected < 3:
+    if number_selected <= 3:
         researcher_selected = [i['Name'].split(']')[0][1:] for i in researcher_selected]
         return 'Co-author Map by City - {}'.format(' ,'.join(researcher_selected))
     else:
@@ -204,7 +204,7 @@ def update_co_author_list_title(researcher_selected, co_author_filtered):
     displayed_number = len(co_author_filtered)
     total_co_author = researcher[researcher.Name.isin(researcher_selected)]['Number of co-authors'].sum()
     number_selected = len(researcher_selected)
-    if number_selected < 5:
+    if number_selected <= 5:
         text = ' ,'.join([i.split(']')[0][1:] for i in researcher_selected])
     else:
         text = '{} Selected Researcher'.format(number_selected)
