@@ -214,7 +214,7 @@ def update_co_author_list_title(researcher_selected, co_author_filtered):
     if number_selected <= 5:
         text = ' ,'.join([i.split(']')[0][1:] for i in researcher_selected])
     else:
-        text = '{} Selected Researcher'.format(number_selected)
+        text = '{} Selected Researchers'.format(number_selected)
     
     return "Co-author List of {} ({} out of {})".format(text, 
                                                        displayed_number, 
