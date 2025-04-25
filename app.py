@@ -50,7 +50,8 @@ co_author_list['Affiliation'] = co_author_list.apply(
 
 
 researcher['Name'] = '[' + researcher.name + ']' + '(' + researcher['Scopus link'] + ')'
-co_author_list = co_author_list.merge(researcher[['name', 'Name']], left_on= 'Researcher', right_on = 'name', how = 'left')
+researcher['researcher_id'] = list(researcher.index)
+co_author_list = co_author_list.merge(researcher[['name', 'Name', 'researcher_id']], left_on= 'Researcher', right_on = 'name', how = 'left')
 
 
 
@@ -64,9 +65,9 @@ co_author_list = co_author_list.merge(researcher[['name', 'Name']], left_on= 'Re
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors']].dropna().sort_values('Name')
+researcher_data = researcher[['Name', 'City', 'Domain', 'Panel', 'Number of co-authors','researcher_id']].dropna().sort_values('Name')
 co_author_list = co_author_list[['Researcher', 'Co-author', 'Affiliation', 'City', 'Country/Territory',
-                                'Name', 'city_lat', 'city_lon']]
+                                'Name', 'city_lat', 'city_lon', 'Documents','researcher_id']]
 
 researcher_selection = dag.AgGrid(
     id="select_researcher",
@@ -143,9 +144,9 @@ app.layout = dbc.Container(
     [dcc.Store(id="store-selected", data=[]),
      heading, intro,
      dbc.Row([dbc.Col(html.Div([researcher_selection_heading, researcher_selection_text, control_panel])),
-              dbc.Col(html.Div([map_heading, map_plot]))]),
+              dbc.Col(html.Div([map_heading, dcc.Loading(map_plot, id = 'map_loading', type="circle")]))]),
      
-     dbc.Row([coauthor_list_heading, grid]),
+     dbc.Row([coauthor_list_heading, dcc.Loading(grid, id = 'table_loading', type="circle")]),
               
          dbc.Col(
                 [
@@ -159,8 +160,8 @@ app.layout = dbc.Container(
 
 @callback(Output("store-selected", "data"), Input("select_researcher", "selectedRows"))
 def filter_coautor(researcher_selected):
-    researcher_selected = [i['Name'] for i in researcher_selected]
-    dff = co_author_list[co_author_list['Name'].isin(researcher_selected)]
+    researcher_selected = [i['researcher_id'] for i in researcher_selected]
+    dff = co_author_list[co_author_list['researcher_id'].isin(researcher_selected)]
     return dff.to_dict('records')
 
 
