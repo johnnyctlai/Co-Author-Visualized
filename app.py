@@ -125,15 +125,16 @@ grid = dag.AgGrid(
     columnDefs= 
     [{"field": 'Researcher', "floatingFilter": False},
      {"field": 'Co-author', "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False},
-     {"field": 'Affiliation', "cellRenderer": "markdown", "linkTarget": "_blank", "floatingFilter": False},
-     {"field": 'Documents', "initialWidth": 150}] +
+     {"field": 'Affiliation', "cellRenderer": "markdown", "linkTarget": "_blank", 
+      "floatingFilter": False, "initialWidth": 250},
+     {"field": 'Documents'}] +
     [{"field": c, "floatingFilter": False} for c in ['City', 'Country/Territory']],
-    defaultColDef={"filter": True,  "wrapHeaderText": True, "autoHeaderHeight": True, "initialWidth": 200 },
+    defaultColDef={"filter": True,  "wrapHeaderText": True, "autoHeaderHeight": True, "initialWidth": 100 },
     dashGridOptions={},
     columnSize="sizeToFit",
     #filterModel={'Report Year': {'filterType': 'number', 'type': 'equals', 'filter': 2023}},
     rowClassRules = {"bg-secondary text-dark bg-opacity-25": "params.node.rowPinned === 'top' | params.node.rowPinned === 'bottom'"},
-    style={"height": 600, "width": "120%"}
+    style={"height": 600, "width": "100%"}
     )
 
 
